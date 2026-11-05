@@ -1,6 +1,6 @@
 # myshell
 
-A basic Unix shell in C, built in stages as a learning project (processes, fork/exec/wait, file descriptors, pipes, dup2, signals). It will later get an optional AI layer that turns natural-language requests into commands using a local Ollama model.
+A basic Unix shell in C, built in stages as a learning project (processes, fork/exec/wait, file descriptors, pipes, dup2, signals). It will later get an optional AI layer that turns natural-language requests into commands using a local LLM.
 
 ## How we work
 
@@ -11,7 +11,7 @@ A basic Unix shell in C, built in stages as a learning project (processes, fork/
 
 ## Environment
 
-The repo lives on Windows, but the shell is POSIX-only. Build, run and test **inside WSL (Ubuntu)**, for example `wsl make` or `wsl ./myshell`. Never try to build with a Windows toolchain.
+The repo lives on Windows, but the shell is POSIX-only. Build, run and test **inside WSL (Ubuntu)**, for example `wsl -d Ubuntu make` or `wsl -d Ubuntu ./myshell` (the default WSL distro on this machine is not Ubuntu). Never try to build with a Windows toolchain.
 
 ## Build
 
@@ -21,7 +21,6 @@ make asan       # same, plus -fsanitize=address,undefined (use when chasing memo
 make valgrind   # build without ASan, then run valgrind --leak-check=full --track-fds=yes
 make test       # tests/run.sh
 make clean
-make AI=0       # build without the AI module and libcurl (once the AI module exists)
 ```
 
 Code must compile without warnings.
@@ -48,10 +47,8 @@ Rules:
 - The parser owns the AST structs (`redirect`, `command`, `pipeline`), defined in `parser.h`.
 - Each stage frees the memory of the input it consumed.
 - Helper functions are `static`. Headers expose only the interface.
-- Even the naive stage-1 parser returns a `pipeline` with one command, so the executor doesn't change when the parser is replaced.
-- The AI module is compiled only when `AI=1`; `ollama.c` is HTTP transport only (libcurl + cJSON) and must stay swappable.
 
-Layout: `include/` (`shell.h lexer.h parser.h executor.h builtins.h ai.h`), `src/` (`main.c input.c lexer.c parser.c executor.c builtins.c signals.c`, `ai/ai.c`, `ai/ollama.c`), `tests/`.
+Layout: headers in `include/`, sources in `src/`, tests in `tests/`.
 
 ## Conventions
 
@@ -60,15 +57,13 @@ Layout: `include/` (`shell.h lexer.h parser.h executor.h builtins.h ai.h`), `src
 - 4-space indent, K&R braces.
 - Errors:
   - Check every syscall.
-  - Print errors to stderr as `myshell: <context>: <strerror>`, e.g. `myshell: cd: No such file or directory`.
-  - A child whose `exec` fails calls `_exit(127)`, or `_exit(126)` for permission errors. Never `exit()` in a child after `fork`.
-  - Allocation failures go through `xmalloc`/`xstrdup`, which print a message and exit.
+  - Print errors to stderr, prefixed with `myshell: `.
+  - Never `exit()` in a child after `fork`; use `_exit()`.
 - When behavior is unclear, match bash/POSIX sh.
 
 ## Testing
 
 - `tests/run.sh` feeds commands into `./myshell` on stdin and compares the output with `bash` running the same commands.
-- From stage 5, add small C unit tests for the lexer and parser (plain `assert`, no framework).
 - A feature is done when tests pass, `make valgrind` reports no leaks and no leaked file descriptors, and the user has reviewed it.
 
 ## Git
