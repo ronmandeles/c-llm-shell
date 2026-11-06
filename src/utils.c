@@ -5,6 +5,11 @@
 
 #include "shell.h"
 
+/*
+ * Report a failed allocation and exit. `what` names the failing call
+ * (e.g. "malloc") and errno holds the reason. Must not be called in a
+ * child after fork(), since it uses exit().
+ */
 static void die_oom(const char *what)
 {
     fprintf(stderr, "myshell: %s: %s\n", what, strerror(errno));
