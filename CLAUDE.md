@@ -7,7 +7,7 @@ A basic Unix shell in C, built in stages as a learning project (processes, fork/
 - **The user plans, Claude implements.** For each feature, first agree on a plan: which files change, which data structures, which syscalls, which edge cases. Claude helps by raising options and pitfalls, but the user makes the decisions. Write code only after the user approves the plan.
 - **Explain while implementing.** For each change, explain the systems concepts it uses: what each syscall does, why it is called in that order, what breaks if a step is skipped (for example, an unclosed pipe end makes the reader hang). Point to the relevant man page (`man 2 pipe`). Keep code and explanation in small steps the user can follow; don't drop a whole module at once.
 - **Stay in the current stage.** Don't implement features from later stages early (see Status). If a later stage will need a change, say so instead of making it.
-- **Language.** Talk to the user in Hebrew and wrap each reply in `<div dir="rtl">…</div>` so it renders right-to-left. Write code, comments, commit messages and docs in English.
+- **Language.** Talk to the user in English. Write code, comments, commit messages and docs in English.
 
 ## Environment
 
@@ -55,6 +55,7 @@ Layout: headers in `include/`, sources in `src/`, tests in `tests/`.
 - Use standard C and POSIX APIs only; avoid Linux- or GNU-specific calls. Read input with `getline` (no readline).
 - `snake_case` everywhere. Structs are `typedef`'d without a `_t` suffix (POSIX reserves `_t`). Macros are `UPPER_CASE`. Header guards look like `MYSHELL_PARSER_H`.
 - 4-space indent, K&R braces.
+- Every function has a short doc comment (one or two lines) above its definition; public functions also get one at their declaration in the header.
 - Errors:
   - Check every syscall.
   - Print errors to stderr, prefixed with `myshell: `.
@@ -71,7 +72,7 @@ Layout: headers in `include/`, sources in `src/`, tests in `tests/`.
 - One branch per feature, created from `main`: `feat/<short-name>` (e.g. `feat/redirections`).
 - Make small commits on the branch with messages like `redirections: open target and dup2 in child`.
 - Push after every commit (`git push -u origin <branch>` the first time).
-- Merge into `main` with `git merge --no-ff` only after the user approves, push `main`, then delete the branch locally and on `origin`.
+- Merge into `main` with `git merge --no-ff`, push `main`, then delete the branch locally and on `origin`. Small changes (docs, renames, comments, config, build tweaks) don't need the user's review; just commit, push and merge. A finished feature still gets reviewed (see Testing).
 - Never commit directly to `main`.
 
 ## Status
