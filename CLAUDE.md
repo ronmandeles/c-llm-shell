@@ -72,7 +72,7 @@ Layout: headers in `include/`, sources in `src/`, tests in `tests/`.
 - One branch per feature, created from `main`: `feat/<short-name>` (e.g. `feat/redirections`).
 - Make small commits on the branch with messages like `redirections: open target and dup2 in child`.
 - Push after every commit (`git push -u origin <branch>` the first time).
-- Merge into `main` with `git merge --no-ff` only after the user approves, push `main`, then delete the branch locally and on `origin`.
+- Merge into `main` with `git merge --no-ff`, push `main`, then delete the branch locally and on `origin`. Small changes (docs, renames, comments, config, build tweaks) don't need the user's review; just commit, push and merge. A finished feature still gets reviewed (see Testing).
 - Never commit directly to `main`.
 
 ## Status
