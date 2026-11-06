@@ -7,24 +7,14 @@ typedef struct {
     int last_status;    /* exit status of the last command, like $? */
 } shell_state;
 
-/*
- * Allocate `size` bytes on the heap, like malloc(3).
- * Never returns NULL: on failure it prints an error to stderr and exits.
- * A size of 0 still returns a unique pointer that must be passed to free().
- */
+/* malloc(3) that never returns NULL: exits on failure. */
 void *xmalloc(size_t size);
 
-/*
- * Resize the block at `ptr` to `size` bytes, like realloc(3).
- * Never returns NULL: on failure it prints an error to stderr and exits.
- * The old pointer is invalid after the call; use the returned one.
- */
+/* realloc(3) that never returns NULL: exits on failure.
+   `ptr` is invalid afterwards; use the returned pointer. */
 void *xrealloc(void *ptr, size_t size);
 
-/*
- * Return a heap-allocated copy of the string `s`, like strdup(3).
- * Never returns NULL. The caller owns the copy and must free() it.
- */
+/* strdup(3) that never returns NULL. The caller must free() the copy. */
 char *xstrdup(const char *s);
 
 #endif
